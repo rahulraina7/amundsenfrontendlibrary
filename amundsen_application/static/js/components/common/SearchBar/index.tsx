@@ -16,6 +16,7 @@ import './styles.scss';
 
 import {
   BUTTON_CLOSE_TEXT,
+  INVALID_SYNTAX_MESSAGE,
   PLACEHOLDER_DEFAULT,
   SIZE_SMALL
 } from './constants';
@@ -104,7 +105,7 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
   handleValueSubmit = (event: React.FormEvent<HTMLFormElement>) : void => {
     const searchTerm = this.state.searchTerm.trim();
     event.preventDefault();
-    if (this.isFormValid()) {
+    if (this.isFormValid(searchTerm)) {
       this.props.submitSearch(searchTerm);
       this.hideTypeAhead();
     }
@@ -114,9 +115,16 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     this.setState({ showTypeAhead: false });
   };
 
-  isFormValid = () : boolean => {
-    const form = document.getElementById("search-bar-form") as HTMLFormElement;
-    return form.checkValidity();
+  isFormValid = (searchTerm: string) : boolean => {
+    const input = document.getElementById("search-input") as HTMLInputElement;
+    const isValid = searchTerm.indexOf(':') < 0;
+    if (!isValid) {
+      input.setCustomValidity(INVALID_SYNTAX_MESSAGE);
+    }
+    else {
+      input.setCustomValidity("");
+    }
+    return isValid;
   };
 
   onSelectInlineResult = (resourceType: ResourceType, updateUrl: boolean = false) : void => {
